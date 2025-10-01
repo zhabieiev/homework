@@ -1,0 +1,30 @@
+{
+  "name": "lesson3",
+  "version": "1.0.0",
+  "description": "task for lesson3",
+  "main": "hello.js",
+  "scripts": {
+    "test": "run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhabieiev/homework.git"
+  },
+  "keywords": [
+    "test"
+  ],
+  "author": "Georgii",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhabieiev/homework/issues"
+  },
+  "homepage": "https://github.com/zhabieiev/homework#readme",
+  "dependencies": {
+    "@eslint/js": "^9.36.0",
+    "@stylistic/eslint-plugin": "^5.4.0",
+    "eslint": "^9.36.0",
+    "eslint-plugin-unicorn": "^61.0.2",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2"
+  }
+}
