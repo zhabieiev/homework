@@ -1,25 +1,13 @@
-const sumNumbers = (arr: number[]): number => {
-    let sum = 0;
+function sum(arr: number[]): number;
+function sum(arr: string[]): string;
 
-    for (const num of arr) {
-        sum += num;
+function sum(arr: number[] | string[]): number | string {
+    if (typeof arr[0] === 'number') {
+        return (arr as number[]).reduce((a, b) => a + b, 0);
+    } else {
+        return (arr as string[]).reduce((a, b) => a + b, '');
     }
+}
 
-    return sum;
-};
-
-const concatStrings = (arr: string[]): string => {
-    let result = '';
-
-    for (const str of arr) {
-        result += str;
-    }
-
-    return result;
-};
-
-const numbers: number[] = [100, 200, 300, 400]; // 1000
-const strings: string[] = ['100', '200', '300', '400']; // "100200300400"
-
-console.log('Sum:', sumNumbers(numbers));
-console.log('Concat:', concatStrings(strings));
+console.log(sum([10, 20, 30, 40]));         // 100
+console.log(sum(['10', '20', '30', '40'])); // 10203040
