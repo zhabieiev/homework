@@ -17,3 +17,11 @@ function concatStr(arr) {
 }
 
 console.log(concatStr(arr));
+
+let a = 'TypeScript';
+let b = 'JavaScript';
+
+[a,b] = [b,a];
+
+console.log(a);
+console.log(b);
