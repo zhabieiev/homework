@@ -1,3 +1,3 @@
 export interface IClickable {
-    click(): Promise<void>;
+    click(): Promise<string>;
 }

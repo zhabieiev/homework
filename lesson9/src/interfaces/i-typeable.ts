@@ -1,3 +1,3 @@
 export interface ITypeable {
-    type(text: string): Promise<void>;
+    type(text: string): Promise<string>;
 }

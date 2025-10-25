@@ -1,4 +1,4 @@
 export interface IComponent {
-    render(): void;
-    interact(): Promise<void>;
+    render(): string;
+    interact(): Promise<string>;
 }

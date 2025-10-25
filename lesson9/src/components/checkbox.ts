@@ -2,16 +2,20 @@ import { BaseComponent } from './base-component';
 import { IClickable } from '../interfaces/i-clickable';
 
 export class Checkbox extends BaseComponent implements IClickable {
-    public render(): void {
-        console.log(`Rendering checkbox: ${this.getName()} ${this.getLocator()}`);
+    public render(): string {
+        const res = `Rendering checkbox: ${this.getName()} ${this.getLocator()}`;
+        console.log(res);
+        return res;
     }
 
-    public async click(): Promise<void> {
-        console.log(`Checkbox ${this.getName()} toggled ${this.getLocator()}`);
+    public async click(): Promise<string> {
+        const res = `Checkbox ${this.getName()} toggled ${this.getLocator()}`;
+        console.log(res);
         await this.simulateDelay();
+        return res;
     }
 
-    public async interact(): Promise<void> {
-        await this.click();
+    public async interact(): Promise<string> {
+        return await this.click();
     }
 }

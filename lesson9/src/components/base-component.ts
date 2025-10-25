@@ -6,19 +6,18 @@ export abstract class BaseComponent implements IComponent {
         private readonly locator: string
     ) {}
 
-    protected getName(): string {
+    public getName(): string {
         return this.name;
     }
 
-    protected getLocator(): string {
+    public getLocator(): string {
         return this.locator;
     }
 
     protected async simulateDelay(): Promise<void> {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 5));
     }
 
-    public abstract render(): void;
-    public abstract interact(): Promise<void>;
+    public abstract render(): string;
+    public abstract interact(): Promise<string>;
 }
-
