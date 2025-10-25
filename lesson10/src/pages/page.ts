@@ -3,6 +3,10 @@ import { IComponent } from '../interfaces/i-component';
 export abstract class Page {
     protected components: IComponent[] = [];
 
+    public getComponents(): IComponent[] {
+        return this.components;
+    }
+
     public addComponent(component: IComponent): number {
         this.components.push(component);
         return this.components.length;
