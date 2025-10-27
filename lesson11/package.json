@@ -1,10 +1,13 @@
 {
-  "name": "lesson7",
+  "name": "lesson11",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:mocha": "npx mocha -r ts-node/register \"src/specs/mocha/**/*.spec.ts\"",
+    "test:jest": "jest --passWithNoTests",
+    "test": "npm run test:mocha && npm run test:jest && npm run test:vitest",
+    "test:vitest": "vitest run"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +19,8 @@
     "@types/chai": "^5.2.3",
     "@types/expect": "^1.20.4",
     "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.9.1",
     "@typescript-eslint/eslint-plugin": "^8.46.0",
     "chai": "^6.2.0",
     "cross-env": "^10.1.0",
@@ -24,10 +29,15 @@
     "eslint-plugin-unicorn": "^61.0.2",
     "globals": "^16.4.0",
     "jest": "^30.2.0",
+    "mocha": "^11.7.4",
     "prettier": "^3.6.2",
     "ts-jest": "^29.4.5",
+    "ts-mocha": "^11.1.0",
     "ts-node": "^10.9.2",
+    "ts-sinon": "^2.0.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.0"
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^4.0.4"
   }
 }

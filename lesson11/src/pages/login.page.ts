@@ -3,9 +3,9 @@ import { Input } from '../components/input';
 import { Button } from '../components/button';
 
 export class LoginPage extends Page {
-    private usernameInput = new Input('Username', '//input[@id=\'username\']');
-    private passwordInput = new Input('Password', '//input[@id=\'password\']');
-    private loginButton = new Button('Login', '//button[@id=\'loginBtn\']');
+    public usernameInput = new Input('Username', '//input[@id=\'username\']');
+    public passwordInput = new Input('Password', '//input[@id=\'password\']');
+    public loginButton = new Button('Login', '//button[@id=\'loginBtn\']');
 
     public constructor() {
         super();
