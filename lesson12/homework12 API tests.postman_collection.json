@@ -1,0 +1,389 @@
+{
+	"info": {
+		"_postman_id": "52bb4b0e-5f83-4e14-ad76-ebbac923bad5",
+		"name": "homework12 API tests",
+		"description": "# homework12 API tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2280683"
+	},
+	"item": [
+		{
+			"name": "TEN - Successful response and properties",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => { pm.response.to.have.status(200); });",
+							"const data = pm.response.json();",
+							"pm.test(\"Response has 10 jokes\", () => { pm.expect(data.length).to.eql(10); });",
+							"pm.test(\"Each joke has required fields\", () => {",
+							"  data.forEach(j => {",
+							"    pm.expect(j).to.have.property('type');",
+							"    pm.expect(j).to.have.property('setup');",
+							"    pm.expect(j).to.have.property('punchline');",
+							"    pm.expect(j).to.have.property('id');",
+							"  });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/ten",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ten"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RANDOM - Successful response and properties",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status 200 and contains one joke\", () => {",
+							"  pm.response.to.have.status(200);",
+							"  const joke = pm.response.json();",
+							"  pm.expect(joke).to.have.property('type');",
+							"  pm.expect(joke).to.have.property('setup');",
+							"  pm.expect(joke).to.have.property('punchline');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/random",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Programming type",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const joke = pm.response.json();",
+							"pm.test(\"Programming joke type\", () => {",
+							"    if (Array.isArray(joke)) {",
+							"        pm.expect(joke.length).to.be.above(0);",
+							"        joke.forEach(j => pm.expect(j.type).to.eql(\"programming\"));",
+							"    } else {",
+							"        pm.expect(joke.type).to.eql(\"programming\");",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/programming/random",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"programming",
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "General type",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const joke = pm.response.json();",
+							"pm.test(\"General joke type\", () => {",
+							"    if (Array.isArray(joke)) {",
+							"        pm.expect(joke.length).to.be.above(0);",
+							"        joke.forEach(j => pm.expect(j.type).to.eql(\"general\"));",
+							"    } else {",
+							"        pm.expect(joke.type).to.eql(\"general\");",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/general/random",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"general",
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TEN - response time",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response time is below 500ms\", () => {",
+							"  pm.expect(pm.response.responseTime).to.be.below(500);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/ten",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ten"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RANDOM - valid JSON",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response is valid JSON\", () => {",
+							"  pm.response.to.be.json;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/random",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TEN - unique IDs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jokes = pm.response.json();",
+							"pm.test(\"Jokes have unique IDs\", () => {",
+							"  const ids = jokes.map(j => j.id);",
+							"  const unique = new Set(ids);",
+							"  pm.expect(unique.size).to.eql(ids.length);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/ten",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ten"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /jokes/programming/ten",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jokes = pm.response.json();",
+							"pm.test(\"All are programming jokes\", () => {",
+							"  jokes.forEach(j => pm.expect(j.type).to.eql('programming'));",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/programming/ten",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"programming",
+						"ten"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RANDOM - punchline not empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const joke = pm.response.json();",
+							"pm.test(\"Punchline is not empty\", () => {",
+							"  pm.expect(joke.punchline).to.not.be.empty;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/random",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TEN - fields types",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jokes = pm.response.json();",
+							"pm.test(\"Fields have correct types\", () => {",
+							"  jokes.forEach(j => {",
+							"    pm.expect(typeof j.type).to.eql('string');",
+							"    pm.expect(typeof j.setup).to.eql('string');",
+							"    pm.expect(typeof j.punchline).to.eql('string');",
+							"  });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/ten",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ten"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3005/jokes",
+			"type": "string"
+		}
+	]
+}
