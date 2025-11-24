@@ -1,0 +1,393 @@
+{
+	"info": {
+		"_postman_id": "7a22e3b7-b870-4df9-bf90-3ac55ad44cbd",
+		"name": "homework13 Integration tests",
+		"description": "Integration tests between images, votes, and favourites modules of TheCatAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2280683"
+	},
+	"item": [
+		{
+			"name": "1️⃣ Get Random Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => pm.response.to.have.status(200));",
+							"const data = pm.response.json();",
+							"pm.expect(data[0]).to.have.property('id');",
+							"pm.expect(data[0]).to.have.property('url');",
+							"pm.environment.set('image_id', data[0].id);",
+							"pm.environment.set('image_url', data[0].url);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/images/search",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"images",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2️⃣ Vote for Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Vote created successfully', () => {",
+							"  pm.response.to.have.status(201);",
+							"  pm.expect(pm.response.json().message).to.eql('SUCCESS');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"image_id\": \"{{image_id}}\",\n  \"value\": 1,\n  \"sub_id\": \"test_user\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/votes",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"votes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3️⃣ Get Votes (verify)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Vote references correct image', () => {",
+							"  pm.response.to.have.status(200);",
+							"  const votes = pm.response.json();",
+							"  const imageId = pm.environment.get('image_id');",
+							"  const found = votes.find(v => v.image_id === imageId);",
+							"  pm.expect(found).to.not.be.undefined;",
+							"  pm.expect(found.image).to.have.property('id', imageId);",
+							"  pm.expect(found.image).to.have.property('url').that.includes('https://');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/votes?sub_id=test_user",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"votes"
+					],
+					"query": [
+						{
+							"key": "sub_id",
+							"value": "test_user"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4️⃣ Add Favourite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Favourite added\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"    var res = pm.response.json();",
+							"    pm.expect(res).to.have.property(\"id\");",
+							"    pm.environment.set(\"favourite_id\", res.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"image_id\": \"{{image_id}}\",\n  \"sub_id\": \"test_user\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/favourites",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"favourites"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5️⃣ Get Favourites (verify added)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Favourite references correct image', () => {",
+							"  pm.response.to.have.status(200);",
+							"  const favs = pm.response.json();",
+							"  const imageId = pm.environment.get('image_id');",
+							"  const found = favs.find(f => f.image_id === imageId);",
+							"  pm.expect(found).to.not.be.undefined;",
+							"  pm.expect(found.image).to.have.property('id', imageId);",
+							"  pm.expect(found.image).to.have.property('url').that.includes('https://');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/favourites?sub_id=test_user",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"favourites"
+					],
+					"query": [
+						{
+							"key": "sub_id",
+							"value": "test_user"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6️⃣ Delete Favourite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Favourite deleted or already not found', () => {",
+							"  const status = pm.response.code;",
+							"  pm.expect([200, 400]).to.include(status);",
+							"  const res = pm.response.json();",
+							"  if (status === 200) pm.expect(res.message).to.eql('SUCCESS');",
+							"  else pm.expect(res.message).to.match(/NOT FOUND/i);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/favourites/{{favourite_id}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"favourites",
+						"{{favourite_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7️⃣ Verify Favourite Removed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Favourite removed', () => {",
+							"  pm.response.to.have.status(200);",
+							"  const favs = pm.response.json();",
+							"  const imageId = pm.environment.get('image_id');",
+							"  const found = favs.some(f => f.image_id === imageId);",
+							"  pm.expect(found).to.be.false;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/favourites?sub_id=test_user",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"favourites"
+					],
+					"query": [
+						{
+							"key": "sub_id",
+							"value": "test_user"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8️⃣ ❌ Vote for Non-existing Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Vote for non-existing image (unexpected API behavior)\", function() {",
+							"    pm.expect(pm.response.code).to.be.oneOf([201, 400, 404]);",
+							"    const res = pm.response.json();",
+							"",
+							"    if (pm.response.code === 201) {",
+							"        console.warn(\"⚠️ API accepted a non-existing image_id\");",
+							"        pm.expect(res).to.have.property(\"message\", \"SUCCESS\");",
+							"        pm.expect(res).to.have.property(\"image_id\", \"non_existing_999999\");",
+							"    } else {",
+							"        pm.expect(res.message).to.match(/not found|invalid/i);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"image_id\": \"non_existing_999999\",\n  \"value\": 1,\n  \"sub_id\": \"test_user\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/votes",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"votes"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "api_key",
+			"value": "live_U2aTjjZEDfskZ09hw5VggKtaVcHhLUywroAadOqv6wUV37UacDCo1qNZmlPfhwoY"
+		},
+		{
+			"key": "baseUrl",
+			"value": "https://api.thecatapi.com/v1"
+		}
+	]
+}
