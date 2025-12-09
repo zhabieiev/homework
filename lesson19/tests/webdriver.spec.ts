@@ -1,13 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { SeleniumDocsPage } from '../src/pages/selenium-docs.page';
-import { DocsWebDriverPage } from '../src/pages/docs/docs-webdriver.page';
+import { test, expect } from '../fixtures/custom-fixtures';
 
-test('Open WebDriver section from sidebar', async ({ page }) => {
-    const docs = new SeleniumDocsPage(page);
-    const webdriver = new DocsWebDriverPage(page);
-
-    await docs.goto();
-    await docs.sidebar.openSection('m-documentationwebdriver');
-
-    await expect(webdriver.heading).toHaveText('WebDriver');
+test('Verify WebDriver page has menu', async ({ seleniumHomePage, seleniumDocsPage }) => {
+    await seleniumHomePage.header.openDocumentation();
+    await seleniumDocsPage.sidebar.openSection('WebDriver');
+    await seleniumDocsPage.sidebar.waitVisible();
 });
+
+test('Open WebDriver section from sidebar', async ({ seleniumHomePage, seleniumDocsPage }) => {
+    await seleniumHomePage.header.openDocumentation();
+    await seleniumDocsPage.sidebar.openSection('WebDriver');
+    await expect(seleniumDocsPage.pageTitle).toHaveText('WebDriver');
+});
+
+

@@ -1,10 +1,10 @@
 // src/pages/docs/docs-base.page.ts
 import { Page, Locator } from '@playwright/test';
-import { BaseModalComponent } from '../../components/base/base-modal.component';
+import { BaseSearchComponent } from '../../components/base/base-search.component';
 
-export class DocsBasePage extends BaseModalComponent {
-    constructor(page: Page, title: string) {
-        super(page, title);
+export class DocsBasePage extends BaseSearchComponent {
+    constructor(page: Page) {
+        super(page);
     }
 
     public get heading(): Locator {

@@ -14,6 +14,10 @@ export class HeaderComponent extends BaseComponent {
         return this.base.locator('#docsearch-1 button.DocSearch-Button');
     }
 
+    get searchInput(): Locator {
+        return this.base.locator('#docsearch-input');
+    }
+
     async openDocumentation(): Promise<void> {
         await this.documentationLink.click();
     }

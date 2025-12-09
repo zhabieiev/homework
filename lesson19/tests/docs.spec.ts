@@ -1,32 +1,21 @@
-import { test, expect } from '@playwright/test';
-import { SeleniumHomePage } from '../src/pages/selenium-home.page';
-import { SeleniumDocsPage } from '../src/pages/selenium-docs.page';
+import { test, expect } from '../fixtures/custom-fixtures';
 
-test('Navigate to documentation from header', async ({ page }) => {
-    const home = new SeleniumHomePage(page);
-    const docs = new SeleniumDocsPage(page);
-
-    await home.goto();
-    await home.header.openDocumentation();
-
-    await expect(page).toHaveURL(/documentation/);
-    await expect(docs.pageTitle).toBeVisible();
+test('Open Documentation page', async ({ seleniumHomePage, seleniumDocsPage }) => {
+    await seleniumHomePage.header.openDocumentation();
+    await expect(seleniumDocsPage.pageTitle).toBeVisible();
 });
 
-test('Search to GRID page', async ({ page }) => {
-    const home = new SeleniumHomePage(page);
+test('Check search field exists', async ({ seleniumHomePage, seleniumDocsPage }) => {
+    await seleniumHomePage.header.openDocumentation();
+    await expect(seleniumDocsPage.header.searchButton).toBeVisible();
+});
 
-    await home.goto();
-    await home.header.search();
-
-    const searchInput = page.locator('#docsearch-input');
-    await searchInput.fill('GRID');
-
-    const gridResultLink = page.getByRole('link', { name: 'Grid' });
-    await gridResultLink.first().click();
-
-    await expect(page).toHaveURL(/grid/);
-
-    const pageHeading = page.locator('h1');
-    await expect(pageHeading).toHaveText(/Grid/);
+test('Check basic search functionality', async ({ seleniumHomePage, seleniumDocsPage }) => {
+    await seleniumHomePage.header.openDocumentation();
+    await seleniumHomePage.header.searchButton.click();
+    await seleniumHomePage.heading.searchInput.click();
+    await seleniumHomePage.heading.searchInput.fill('Grid');
+    const exactMatchLink = seleniumHomePage.heading.getSearchHit('Grid');
+    await exactMatchLink.click();
+    await expect(seleniumDocsPage.pageTitle).toHaveText('Grid');
 });

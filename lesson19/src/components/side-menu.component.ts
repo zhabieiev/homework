@@ -7,7 +7,7 @@ export class SideMenuComponent extends BaseComponent {
     }
 
     link(text: string): Locator {
-        return this.base.locator(`//a[@id='${text}']`);
+        return this.base.locator(`//a[span[text()='${text}']]`);
     }
 
     async openSection(text: string): Promise<void> {
