@@ -88,6 +88,9 @@ jobs:
         working-directory: ${{ env.BUILD_FOLDER }}
         env:
           BUILD_FOLDER: ./lesson22
+      
+      - name: Debug File Path
+        run: ls -R ${{ github.workspace }}/
     
       - name: Publish Playwright Test Summary
         uses: daun/playwright-report-summary@v3
