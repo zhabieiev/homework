@@ -37,93 +37,81 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: ${{ env.BUILD_FOLDER }}
-      
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
         working-directory: ${{ env.BUILD_FOLDER }}
-      
+
       - name: Run Playwright tests
         run: npm test
         working-directory: ${{ env.BUILD_FOLDER }}
-        continue-on-error: true 
+        continue-on-error: true
 
       - uses: actions/upload-artifact@v4
-        if: always() 
+        if: always()
         with:
           name: test-results-json
-          path: ${{ env.BUILD_FOLDER }}/test-results.json 
+          path: ${{ env.BUILD_FOLDER }}/test-results.json
           retention-days: 7
 
       - uses: actions/upload-artifact@v4
-        if: always() 
+        if: always()
         with:
           name: playwright-html-report
-          path: ${{ env.BUILD_FOLDER }}/playwright-report 
+          path: ${{ env.BUILD_FOLDER }}/playwright-report
           retention-days: 30
 
   report:
-    name: Generate and Publish Reports
+    name: Generate Test Reports
     runs-on: ubuntu-latest
     needs: [test]
     if: always()
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download JSON Report for Summary Action
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results-json
-          path: ${{ env.BUILD_FOLDER }}/
-          
-      - name: Download Playwright HTML Report
-        uses: actions/download-artifact@v4
-        with:
-          name: playwright-html-report
-          path: ${{ env.BUILD_FOLDER }}/playwright-report
-
-      - name: Setup Node.js 24.x
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: '24.x' 
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
         working-directory: ${{ env.BUILD_FOLDER }}
-        
-      - name: Debug File Path
-        run: ls -R ${{ github.workspace }}/
-    
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report
+          path: ${{ env.BUILD_FOLDER }}/playwright-report/
+          retention-days: 30
+
       - name: Publish Playwright Test Summary
         uses: daun/playwright-report-summary@v3
         if: always()
         with:
-          report-file: ${{ github.workspace }}/${{ env.BUILD_FOLDER }}/test-results.json
+          report-file: ${{ env.BUILD_FOLDER }}/test-results.json
           report-tag: 'Test Results Summary'
           job-summary: true
           create-comment: true
-    
+
       - name: Comment PR with reports
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const comment = `## 🎭 Playwright Test Results
-
             ### 📊 Reports
-            - **Playwright HTML Report:** [Go to Artifacts](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts)
-            *(To view, download and unzip the \`playwright-html-report\` file)*
-
-            ### 📝 Summary Details
+            - Playwright Report: Download the \`playwright-html-report\` artifact
+            - Allure Reports: Download artifacts for detailed analysis
+            ### 📝 Summary
             - **Run Number:** ${{ github.run_number }}
             - **Commit:** ${{ github.sha }}
-            - **Branch:** ${{ github.head_ref || github.ref_name }}
-
-            [View Full Run History](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
+            - **Branch:** ${{ github.head_ref }}
+            Check the workflow run for detailed test results and artifacts.
             `;
-
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -136,7 +124,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, report]
     if: always()
-
     steps:
       - name: Check test status
         id: test_status
