@@ -18,3 +18,11 @@ Import the collection to your instance of Postman using this [guide](https://lea
 Because we used picture upload from the local file system  - **please update /images/upload** request with the file from your file system before running request or running collection 
 
 To run collection from Postman - Right click on this collection and select Run Collection
+
+Домашнє завдання
+Опис завдання: 
+
+Клонувати проєкт https://github.com/15Dkatz/official_joke_api.
+Запустити клонований проєкт, використовуючи підказки з репозиторію.
+Створити 10 тестів за допомогою Postman.
+Експортувати колекцію в JSON.
