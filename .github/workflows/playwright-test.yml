@@ -55,7 +55,7 @@ jobs:
           path: ${{ env.BUILD_FOLDER }}/playwright-report 
           retention-days: 30
 
-report:
+  report:
     name: Generate and Publish Reports
     runs-on: ubuntu-latest
     needs: [test]
