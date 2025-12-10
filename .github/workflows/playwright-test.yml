@@ -1,0 +1,77 @@
+name: Playwright CI Tests
+
+on:
+  push:
+    branches: [ main, master, lesson22 ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  checks: write
+  pull-requests: write
+  actions: read
+  pages: write
+  id-token: write
+
+env:
+  AUTOMATION_EXERCISE_EMAIL: ${{ secrets.AUTOMATION_EXERCISE_EMAIL }}
+  AUTOMATION_EXERCISE_PASSWORD: ${{ secrets.AUTOMATION_EXERCISE_PASSWORD }}
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    env:
+      BUILD_FOLDER: ./lesson22
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.x
+    
+    - name: Install dependencies
+      run: npm ci
+      working-directory: ${{ env.BUILD_FOLDER }}
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+      working-directory: ${{ env.BUILD_FOLDER }}
+    
+    - name: Run Playwright tests
+      run: npm run test
+      working-directory: ${{ env.BUILD_FOLDER }}
+    
+    - uses: daun/playwright-report-summary@v3
+      if: always()
+      with:
+        report-file: ${{ env.BUILD_FOLDER }}/test-results/test-results.json
+        report-tag: 'Test Results Summary'
+        job-summary: true
+        comment-on-pr: true
+    
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: upload test-results
+        path: ${{ env.BUILD_FOLDER }}/test-results
+        retention-days: 30
+    
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: upload mochawesome-report
+        path: ${{ env.BUILD_FOLDER }}/mochawesome-report
+        retention-days: 30
+    
+    - name: Generate Allure Single-file report
+      run: |
+        npx allure generate allure-results --single-file --clean -o allure-report-single-file
+      working-directory: ${{ env.BUILD_FOLDER }}
+    
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: upload allure-report-single-file
+        path: ${{ env.BUILD_FOLDER }}/allure-report-single-file
+        retention-days: 30
