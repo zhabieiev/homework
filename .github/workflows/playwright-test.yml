@@ -13,6 +13,8 @@ permissions:
   actions: read
 
 env:
+  NODE_VERSION: '24.x'
+  BUILD_FOLDER: ./lesson22
   AUTOMATION_EXERCISE_EMAIL: ${{ secrets.AUTOMATION_EXERCISE_EMAIL }}
   AUTOMATION_EXERCISE_PASSWORD: ${{ secrets.AUTOMATION_EXERCISE_PASSWORD }}
 
@@ -20,14 +22,18 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    env:
-      BUILD_FOLDER: ./lesson22
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          node-version: 24.x
-      
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
       - name: Install dependencies
         run: npm ci
         working-directory: ${{ env.BUILD_FOLDER }}
@@ -86,9 +92,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: ${{ env.BUILD_FOLDER }}
-        env:
-          BUILD_FOLDER: ./lesson22
-      
+        
       - name: Debug File Path
         run: ls -R ${{ github.workspace }}/
     
