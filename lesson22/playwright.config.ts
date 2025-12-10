@@ -25,11 +25,11 @@ export default defineConfig({
     reporter: process.env.CI
         ? [
             ['list'],
-            ['html', { open: 'never', outputFolder: 'playwright-report' }]
+            ['json', { open: 'never', outputFile: 'test-results.json' }]
         ]
         : [
             ['list'],
-            ['html']
+            ['html', { open: 'never', outputFolder: 'playwright-report' }]
         ],
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {

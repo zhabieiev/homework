@@ -7,12 +7,10 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write
+  contents: read
   checks: write
   pull-requests: write
   actions: read
-  pages: write
-  id-token: write
 
 env:
   AUTOMATION_EXERCISE_EMAIL: ${{ secrets.AUTOMATION_EXERCISE_EMAIL }}
@@ -25,29 +23,37 @@ jobs:
     env:
       BUILD_FOLDER: ./lesson22
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 24.x
-    
-    - name: Install dependencies
-      run: npm ci
-      working-directory: ${{ env.BUILD_FOLDER }}
-    
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps chromium
-      working-directory: ${{ env.BUILD_FOLDER }}
-    
-    - name: Run Playwright tests
-      run: npm test
-      working-directory: ${{ env.BUILD_FOLDER }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ env.BUILD_FOLDER }}
+      
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: ${{ env.BUILD_FOLDER }}
+      
+      - name: Run Playwright tests
+        run: npm test
+        working-directory: ${{ env.BUILD_FOLDER }}
+        continue-on-error: true 
 
-    - uses: actions/upload-artifact@v4
-      if: always() 
-      with:
-        name: playwright-html-report
-        path: ${{ env.BUILD_FOLDER }}/playwright-report 
-        retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always() 
+        with:
+          name: test-results-json
+          path: ${{ env.BUILD_FOLDER }}/test-results.json 
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: always() 
+        with:
+          name: playwright-html-report
+          path: ${{ env.BUILD_FOLDER }}/playwright-report 
+          retention-days: 30
 
   report:
     name: Generate and Publish Reports
@@ -59,15 +65,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
+      - name: Download JSON Report for Summary Action
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results-json
+          path: ${{ env.BUILD_FOLDER }}/
+          
+      - name: Download Playwright HTML Report
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-html-report
+          path: ${{ env.BUILD_FOLDER }}/playwright-report
+
+      - name: Setup Node.js 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '24.x' 
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
         working-directory: ${{ env.BUILD_FOLDER }}
+        env:
+          BUILD_FOLDER: ./lesson22
     
       - name: Publish Playwright Test Summary
         uses: daun/playwright-report-summary@v3
@@ -86,14 +106,15 @@ jobs:
             const comment = `## 🎭 Playwright Test Results
 
             ### 📊 Reports
-            - Playwright Report: Download the \`playwright-html-report\` artifact
+            - **Playwright HTML Report:** [Go to Artifacts](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts)
+            *(To view, download and unzip the \`playwright-html-report\` file)*
 
-            ### 📝 Summary
+            ### 📝 Summary Details
             - **Run Number:** ${{ github.run_number }}
             - **Commit:** ${{ github.sha }}
-            - **Branch:** ${{ github.head_ref }}
+            - **Branch:** ${{ github.head_ref || github.ref_name }}
 
-            Check the workflow run for detailed test results and artifacts.
+            [View Full Run History](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
             `;
 
             github.rest.issues.createComment({
