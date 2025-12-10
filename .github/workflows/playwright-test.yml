@@ -75,12 +75,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+      
       - name: Setup Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
           
       - name: Ensure Build Folder Exists
         run: mkdir -p ${{ env.BUILD_FOLDER }}
@@ -90,12 +89,6 @@ jobs:
         with:
           name: test-results-json
           path: ${{ env.BUILD_FOLDER }}/
-      
-      - name: List Downloaded JSON
-        run: ls -R ${{ env.BUILD_FOLDER }}
-
-      - name: Verify JSON Content
-        run: cat ${{ env.BUILD_FOLDER }}/test-results/test-results.json
 
       - name: Download HTML Report
         uses: actions/download-artifact@v4
@@ -103,6 +96,12 @@ jobs:
           name: playwright-html-report
           path: ${{ env.BUILD_FOLDER }}/
 
+      - name: List Downloaded Files
+        run: ls -R ${{ env.BUILD_FOLDER }}
+        
+      - name: Verify JSON Content
+        run: cat ${{ env.BUILD_FOLDER }}/test-results.json
+        
       - name: Install dependencies
         run: npm ci
         working-directory: ${{ env.BUILD_FOLDER }}
@@ -111,7 +110,7 @@ jobs:
         uses: daun/playwright-report-summary@v3
         if: always()
         with:
-          report-file: ${{ github.workspace }}/${{ env.BUILD_FOLDER }}/test-results/test-results.json
+          report-file: ${{ env.BUILD_FOLDER }}/test-results.json 
           report-tag: 'Test Results Summary'
           job-summary: true
           create-comment: true
