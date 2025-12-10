@@ -41,37 +41,10 @@ jobs:
     - name: Run Playwright tests
       run: npm test
       working-directory: ${{ env.BUILD_FOLDER }}
-    
-    - uses: daun/playwright-report-summary@v3
-      if: always()
-      with:
-        report-file: ${{ env.BUILD_FOLDER }}/test-results/test-results.json
-        report-tag: 'Test Results Summary'
-        job-summary: true
-        comment-on-pr: true
-    
+
     - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
+      if: always() 
       with:
-        name: upload test-results
-        path: ${{ env.BUILD_FOLDER }}/test-results
-        retention-days: 30
-    
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: upload mochawesome-report
-        path: ${{ env.BUILD_FOLDER }}/mochawesome-report
-        retention-days: 30
-    
-    - name: Generate Allure Single-file report
-      run: |
-        npx allure generate allure-results --single-file --clean -o allure-report-single-file
-      working-directory: ${{ env.BUILD_FOLDER }}
-    
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: upload allure-report-single-file
-        path: ${{ env.BUILD_FOLDER }}/allure-report-single-file
+        name: playwright-html-report
+        path: ${{ env.BUILD_FOLDER }}/playwright-report 
         retention-days: 30

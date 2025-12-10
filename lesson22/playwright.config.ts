@@ -25,14 +25,11 @@ export default defineConfig({
     reporter: process.env.CI
         ? [
             ['list'],
-            ['blob'],
-            ['allure-playwright'],
-            ['json', { outputFile: 'test-results/test-results.json' }],
-            ['junit', { outputFile: 'test-results/test-results.xml' }],
-            ['pwmochawesome', { charts: true, reportTitle: 'Automation Exercise Test Report', reportFilename: 'automation-exercise-report' }]
+            ['html', { open: 'never', outputFolder: 'playwright-report' }]
         ]
         : [
-            ['list']
+            ['list'],
+            ['html']
         ],
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
