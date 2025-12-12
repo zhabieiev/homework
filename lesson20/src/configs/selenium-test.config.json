@@ -1,0 +1,8 @@
+{
+    "uiConfig": {
+        "seleniumHomeUrl": "https://www.selenium.dev/"
+    },
+    "apiConfig": {
+        "seleniumApiUrl": "https://plausible.io/api/event"
+    }
+}

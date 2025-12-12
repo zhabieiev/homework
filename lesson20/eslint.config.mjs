@@ -21,11 +21,11 @@ export default tsEslint.config({
         '@typescript-eslint/no-unused-expressions': ['off'],
         '@typescript-eslint/consistent-indexed-object-style': 'off',
         '@typescript-eslint/no-explicit-any': 'warn',
-        '@typescript-eslint/explicit-member-accessibility': 'off',
+        '@typescript-eslint/explicit-member-accessibility': 'error',
         '@typescript-eslint/no-shadow': 'error',
         '@typescript-eslint/require-await': 'error',
         '@typescript-eslint/explicit-function-return-type': [
-            'off',
+            'error',
             {
                 allowExpressions: true
             }
