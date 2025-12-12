@@ -122,24 +122,24 @@ jobs:
           script: |
             const comment = `## 🎭 Playwright Test Results Summary
 
-            ### 📊 Reports
-            - **Summary Report:** Details available in the **Job Summary** section.
-            - **Playwright HTML Report:** [Go to Artifacts](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts)
-              *(Download and unzip the \`playwright-html-report\` artifact for full trace/screenshots.)*
+             ### 📊 Reports
+             - **Summary Report:** Details available in the **Job Summary** section.
+             - **Playwright HTML Report:** [Go to Artifacts](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts)
+             *(Download and unzip the \`playwright-html-report\` artifact for full trace/screenshots.)*
 
-            ### 📝 Run Details
-            - **Run Number:** \${{ github.run_number }}
-            - **Commit:** \${{ github.sha }}
-            - **Branch:** \${{ github.head_ref || github.ref_name }}
+             ### 📝 Run Details
+             - **Run Number:** ${{ github.run_number }} <--- ИСПРАВЛЕНО
+             - **Commit:** ${{ github.sha }}           <--- ИСПРАВЛЕНО
+              - **Branch:** ${{ github.head_ref || github.ref_name }}
 
             [View Full Workflow Run](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
             `;
-                        github.rest.issues.createComment({
+                       github.rest.issues.createComment({
                           issue_number: context.issue.number,
                           owner: context.repo.owner,
                           repo: context.repo.repo,
-                          body: comment
-                        });
+                           body: comment
+                    });
 
   # ====================================================================
   # JOB 3: Final Notifications and Summary
