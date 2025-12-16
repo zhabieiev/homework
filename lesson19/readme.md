@@ -17,3 +17,10 @@ project/
       ├── smoke
       ├── regression
       └── webdriver.spec.ts
+
+
+npm test && npm run allure:generate && npm run allure:open
+
+npx allure generate allure-results --single-file
+
+npm run reports:all
