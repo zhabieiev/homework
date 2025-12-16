@@ -1,0 +1,9 @@
+node_modules
+build
+dist
+playwright-report/
+test-results/
+.git
+.DS_Store
+*.log
+docker-compose.yml
