@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  expense-tracker-ui-tests:
+    image: lesson23-expense-tracker-ui-tests
+    build: .
+    environment:
+      - CI=true
+      - BASE_URL=http://localhost:3000
+    volumes:
+      - ./reports_archive:/app/app-source/archive
+    working_dir: /app/app-source
+    command: sh -c "npx serve -s build -l 3000 & npx wait-on http://localhost:3000 --timeout 60000 && npx playwright test --config=playwright.config.ts && zip -r /app/app-source/archive/playwright-report.zip playwright-report"
