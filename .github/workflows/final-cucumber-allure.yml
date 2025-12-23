@@ -1,4 +1,4 @@
-name: Cucumber API/UI Tests (Allure)
+name: Cucumber UI Tests Only (Allure)
 
 on:
   push:
@@ -14,26 +14,22 @@ permissions:
   contents: read
   checks: write
   pull-requests: write
-  actions: read
 
 env:
   NODE_VERSION: '20.x'
   BUILD_FOLDER: ./final
 
 jobs:
-  # ====================================================================
-  # JOB 1: Run Cucumber tests and upload Allure results
-  # ====================================================================
-  test:
-    name: Run Cucumber Tests
+  test-ui:
+    name: Run UI Tests Only
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -44,90 +40,25 @@ jobs:
         working-directory: ${{ env.BUILD_FOLDER }}
         run: npm ci
 
-      - name: Run Cucumber tests (TS + ESM)
+      - name: Install Playwright Browsers
         working-directory: ${{ env.BUILD_FOLDER }}
-        run: npm run cucumber
+        run: npx playwright install --with-deps
+      
+      - name: Run UI tests
+        working-directory: ${{ env.BUILD_FOLDER }}
+
+        run: npx cross-env ENV=qa npm run cucumber -- --tags "@ui and not @api"
         continue-on-error: true
 
-      - name: Upload Allure results
+      - name: Generate Allure Report
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-results
-          path: ${{ env.BUILD_FOLDER }}/allure-results
-          retention-days: 7
-
-  # ====================================================================
-  # JOB 2: Generate Allure report
-  # ====================================================================
-  report:
-    name: Generate Allure Report
-    runs-on: ubuntu-latest
-    needs: [test]
-    if: always()
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Download Allure results
-        uses: actions/download-artifact@v4
-        with:
-          name: allure-results
-          path: allure-results
-
-      - name: Install Allure CLI
-        run: npm install -g allure-commandline
-
-      - name: Generate Allure report
-        run: allure generate allure-results --clean -o allure-report
+        working-directory: ${{ env.BUILD_FOLDER }}
+        run: npx allure generate allure-results --clean -o allure-report
 
       - name: Upload Allure HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-html-report
-          path: allure-report
-          retention-days: 30
-
-      - name: Add Allure link to Job Summary
-        run: |
-          echo "## 📊 Allure Test Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "📦 Download **allure-html-report** from Artifacts:" >> $GITHUB_STEP_SUMMARY
-          echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" >> $GITHUB_STEP_SUMMARY
-
-  # ====================================================================
-  # JOB 3: PR Comment
-  # ====================================================================
-  notify:
-    name: Comment PR with Allure Report
-    runs-on: ubuntu-latest
-    needs: [test, report]
-    if: always() && github.event_name == 'pull_request'
-
-    steps:
-      - name: Comment PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const comment = `## 🧪 Cucumber + Allure Test Results
-
-            📦 **Allure HTML report** is available in workflow artifacts.
-
-            🔗 [View workflow run](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
-
-            **Run:** #${{ github.run_number }}
-            **Commit:** ${{ github.sha }}
-            `;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+          path: ${{ env.BUILD_FOLDER }}/allure-report
+          retention-days: 14
