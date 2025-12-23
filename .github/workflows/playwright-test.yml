@@ -3,8 +3,12 @@ name: Playwright CI Tests
 on:
   push:
     branches: [ main, master, lesson22 ]
+    paths:
+      - 'lesson22/**'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'lesson22/**'
 
 permissions:
   contents: read
@@ -25,6 +29,7 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,29 +41,32 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: ${{ env.BUILD_FOLDER }}/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
         working-directory: ${{ env.BUILD_FOLDER }}
+        run: npm ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
         working-directory: ${{ env.BUILD_FOLDER }}
+        run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
-        run: npm test
         working-directory: ${{ env.BUILD_FOLDER }}
+        run: npm test
         continue-on-error: true
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload JSON test results
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: test-results-json
-          path: ${{ env.BUILD_FOLDER }}/test-results/test-results.json 
+          path: ${{ env.BUILD_FOLDER }}/test-results/test-results.json
           retention-days: 7
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload Playwright HTML report
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-html-report
           path: ${{ env.BUILD_FOLDER }}/playwright-report
@@ -72,6 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     if: always()
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -80,7 +89,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          
+
       - name: Ensure Build Folder Exists
         run: mkdir -p ${{ env.BUILD_FOLDER }}
 
@@ -88,30 +97,30 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: test-results-json
-          path: ${{ env.BUILD_FOLDER }}/
+          path: ${{ env.BUILD_FOLDER }}
 
       - name: Download HTML Report
         uses: actions/download-artifact@v4
         with:
           name: playwright-html-report
-          path: ${{ env.BUILD_FOLDER }}/
+          path: ${{ env.BUILD_FOLDER }}
 
       - name: List Downloaded Files
         run: ls -R ${{ env.BUILD_FOLDER }}
-        
+
       - name: Verify JSON Content
         run: cat ${{ env.BUILD_FOLDER }}/test-results.json
-        
+
       - name: Install dependencies
-        run: npm ci
         working-directory: ${{ env.BUILD_FOLDER }}
+        run: npm ci
 
       - name: Publish Playwright Test Summary
-        uses: daun/playwright-report-summary@v3
         if: always()
+        uses: daun/playwright-report-summary@v3
         with:
-          report-file: ${{ env.BUILD_FOLDER }}/test-results.json 
-          report-tag: 'Test Results Summary'
+          report-file: ${{ env.BUILD_FOLDER }}/test-results.json
+          report-tag: 'Playwright Test Results'
           job-summary: true
           create-comment: true
 
@@ -122,24 +131,23 @@ jobs:
           script: |
             const comment = `## 🎭 Playwright Test Results Summary
 
-             ### 📊 Reports
-             - **Summary Report:** Details available in the **Job Summary** section.
-             - **Playwright HTML Report:** [Go to Artifacts](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts)
-             *(Download and unzip the \`playwright-html-report\` artifact for full trace/screenshots.)*
+            ### 📊 Reports
+            - **Summary Report:** Available in the **Job Summary**
+            - **Playwright HTML Report:** [Artifacts](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts)
 
-             ### 📝 Run Details
-             - **Run Number:** ${{ github.run_number }} <--- ИСПРАВЛЕНО
-             - **Commit:** ${{ github.sha }}           <--- ИСПРАВЛЕНО
-              - **Branch:** ${{ github.head_ref || github.ref_name }}
+            ### 📝 Run Details
+            - **Run Number:** ${{ github.run_number }}
+            - **Commit:** ${{ github.sha }}
+            - **Branch:** ${{ github.head_ref || github.ref_name }}
 
             [View Full Workflow Run](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})
             `;
-                       github.rest.issues.createComment({
-                          issue_number: context.issue.number,
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                           body: comment
-                    });
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
 
   # ====================================================================
   # JOB 3: Final Notifications and Summary
@@ -149,16 +157,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, report]
     if: always()
+
     steps:
       - name: Check test status
         id: test_status
         run: |
           if [ "${{ needs.test.result }}" == "success" ]; then
             echo "status=✅ Tests Passed" >> $GITHUB_OUTPUT
-            echo "color=success" >> $GITHUB_OUTPUT
           else
             echo "status=❌ Tests Failed" >> $GITHUB_OUTPUT
-            echo "color=failure" >> $GITHUB_OUTPUT
           fi
 
       - name: Add final summary
@@ -170,4 +177,4 @@ jobs:
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Run number:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY     
+          echo "**Run number:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
