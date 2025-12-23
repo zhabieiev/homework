@@ -6,7 +6,6 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 .auth/
-allure*/
 local.log
 log/
 mochawesome-report/
