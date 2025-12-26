@@ -76,21 +76,24 @@ jobs:
         if: always()
         run: |
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-results/history
-          cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/ || echo "No history yet"
+          cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/ || echo "No history found"
 
       - name: Generate Allure Report
         if: always()
-        run: npx allure generate -o ${{ env.BUILD_FOLDER }}/allure-report ${{ env.BUILD_FOLDER }}/allure-results
+        run: |
+          npx allure generate -o ${{ env.BUILD_FOLDER }}/allure-report ${{ env.BUILD_FOLDER }}/allure-results
 
       - name: Save history to report
         if: always()
-        run: cp -r ${{ env.BUILD_FOLDER }}/allure-results/history ${{ env.BUILD_FOLDER }}/allure-report/
+        run: |
+          mkdir -p ${{ env.BUILD_FOLDER }}/allure-report/history
+          cp -r ${{ env.BUILD_FOLDER }}/allure-results/history/* ${{ env.BUILD_FOLDER }}/allure-report/history/ || echo "No history to save"
 
       - name: Upload artifact for deployment
         if: always()
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.BUILD_FOLDER }}/allure-report
+          path: final/allure-report
 
       - name: Deploy to GitHub Pages
         if: always()
@@ -98,12 +101,12 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Upload Screenshots Artifact
-        if: always() # Сохраняем папку, если она была создана в ui.hooks.ts
+        if: always()
         uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
           name: test-screenshots
-          path: ${{ env.BUILD_FOLDER }}/reports/screenshots/
+          path: final/reports/screenshots/
           retention-days: 7
 
       - name: Upload Allure HTML report (as Zip)
@@ -111,5 +114,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: allure-html-report
-          path: ${{ env.BUILD_FOLDER }}/allure-report
+          path: final/allure-report
           retention-days: 14
