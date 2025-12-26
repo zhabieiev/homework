@@ -4,37 +4,37 @@ import { PropertyLoader } from '../../support/utils/property-loader.ts';
 import { CustomWorld } from '../worlds/world.ts';
 
 setDefaultTimeout(30 * 1000);
-
 expect.configure({ timeout: 15000 });
 
 Before({ tags: '@ui' }, async function (this: CustomWorld) {
     PropertyLoader.loadEnvProperties(this.varController);
 
     this.browser = await chromium.launch({
-        headless: false,
-        slowMo: 500,
-        args: ['--start-maximized']
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     this.context = await this.browser.newContext({
-        viewport: null
+        viewport: { width: 1920, height: 1080 } 
     });
 
     this.page = await this.context.newPage();
-
     this.page.setDefaultTimeout(10000);
 });
 
 After({ tags: '@ui' }, async function (this: CustomWorld, scenario) {
-    if (scenario.result?.status === Status.FAILED) {
-        const screenshot = await this.page.screenshot({
-            path: `./reports/screenshots/${scenario.pickle.name}.png`,
-            fullPage: true
-        });
-        this.attach(screenshot, 'image/png');
+    if (this.page && scenario.result?.status === Status.FAILED) {
+        try {
+            const screenshot = await this.page.screenshot({
+                fullPage: true
+            });
+            this.attach(screenshot, 'image/png');
+        } catch (error) {
+            console.error('Не удалось сделать скриншот:', error);
+        }
     }
 
-    if (this.page) await this.page.close();
-    if (this.context) await this.context.close();
-    if (this.browser) await this.browser.close();
+    await this.page?.close();
+    await this.context?.close();
+    await this.browser?.close();
 });

@@ -13,7 +13,7 @@ module.exports = {
     paths: ["features/**/*.feature"],
     import: isCI 
       ? [
-          "src/ui/step-definitions/**/*.ts", 
+          "src/ui/steps/**/*.ts",
           "src/support/worlds/world.ts",
           "src/support/hooks/ui.hooks.ts"
         ] 
