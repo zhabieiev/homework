@@ -64,6 +64,13 @@ jobs:
             --format summary \
             --backtrace
 
+      # Шаг отладки: проверяем, что Cucumber создал файлы результатов
+      - name: Debug Allure Results Folder
+        if: always()
+        run: |
+          echo "Checking for result files in ${{ env.BUILD_FOLDER }}/allure-results:"
+          ls -R ${{ env.BUILD_FOLDER }}/allure-results || echo "Directory not found"
+
       - name: Load Allure history
         uses: actions/checkout@v4
         if: always()
@@ -81,7 +88,8 @@ jobs:
       - name: Generate Allure Report
         if: always()
         run: |
-          npx allure generate -o ${{ env.BUILD_FOLDER }}/allure-report ${{ env.BUILD_FOLDER }}/allure-results
+          # В Allure 3.0 путь к результатам идет перед флагом --output
+          npx allure generate ${{ env.BUILD_FOLDER }}/allure-results --output ${{ env.BUILD_FOLDER }}/allure-report
 
       - name: Save history to report
         if: always()
