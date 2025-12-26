@@ -14,12 +14,29 @@ export class DeepSearchComponent extends BaseComponent {
     }
 
     async openTab(tabName: string) {
-        const targetTab = this.tabs.filter({ hasText: tabName });
-        await targetTab.click();
+        const targetTab = this.tabs.filter({ 
+            hasText: new RegExp(`^${tabName}(\\s\\(\\d+\\))?$`) 
+        });
+        
+        await targetTab.waitFor({ state: 'visible', timeout: 10000 });
+        await targetTab.scrollIntoViewIfNeeded();
+        await targetTab.click({ force: true, position: { x: 10, y: 10 } });
+        const isSelected = await targetTab.getAttribute('aria-selected');
+        if (isSelected === 'false') {
+            await targetTab.dispatchEvent('click');
+        }
+
         await expect(targetTab).toHaveAttribute('aria-selected', 'true', { timeout: 15000 });
         
         const activePanel = this.root.locator(this.TAB_CONTENT_SELECTOR).filter({ visible: true });
-        await activePanel.locator(this.TIMESTAMP_SELECTOR).first().waitFor({ state: 'visible', timeout: 10000 });
+        const tabText = await targetTab.innerText();
+
+        if (!tabText.includes('(0)')) {
+            await activePanel.locator(this.TIMESTAMP_SELECTOR).first().waitFor({ 
+                state: 'visible', 
+                timeout: 15000 
+            });
+        }
     }
 
     get activeTimestamps(): Locator {

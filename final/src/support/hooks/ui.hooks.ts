@@ -8,13 +8,15 @@ import { PropertyLoader } from '../utils/property-loader.ts';
 Before({ tags: '@ui' }, async function (this: CustomWorld) {
     PropertyLoader.loadEnvProperties(this.varController);
 
+    const isCi = process.env.CI === 'true';
+
     this.browser = await chromium.launch({
-        headless: process.env.CI === 'true',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        headless: isCi,
+        args: isCi ? ['--no-sandbox', '--disable-setuid-sandbox'] : ['--start-maximized']
     });
 
     this.context = await this.browser.newContext({
-        viewport: { width: 1920, height: 1080 }
+        viewport: isCi ? { width: 1920, height: 1080 } : null
     });
 
     this.page = await this.context.newPage();
