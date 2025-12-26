@@ -53,11 +53,6 @@ jobs:
       - name: Install Playwright Browsers
         working-directory: ${{ env.BUILD_FOLDER }}
         run: npx playwright install --with-deps
-      
-      - name: Run UI tests
-        working-directory: ${{ env.BUILD_FOLDER }}
-        continue-on-error: true 
-        run: npm run test:ci:ui
 
       - name: Load Allure history
         uses: actions/checkout@v4
@@ -67,17 +62,25 @@ jobs:
           ref: gh-pages
           path: gh-pages-dir
 
-      - name: Prepare Results and History
+      - name: Prepare Clean Results with History
         if: always()
         run: |
+          mkdir -p ${{ env.BUILD_FOLDER }}/allure-results
+          
+          find ${{ env.BUILD_FOLDER }}/allure-results -maxdepth 1 -type f -delete
+          
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-results/history
           if [ -d "gh-pages-dir/history" ] && [ "$(ls -A gh-pages-dir/history)" ]; then
             cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/
           fi
+          
           echo "Executor=GitHub Actions" > ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
           echo "Run_Number=${{ github.run_number }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
-          echo "Run_ID=${{ github.run_id }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
-          echo "Branch=${{ github.ref_name }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
+
+      - name: Run UI tests
+        working-directory: ${{ env.BUILD_FOLDER }}
+        continue-on-error: true 
+        run: npm run test:ci:ui
 
       - name: Generate Allure Report
         if: always()
@@ -85,17 +88,11 @@ jobs:
           rm -rf ${{ env.BUILD_FOLDER }}/allure-report
           npx allure-commandline@2.30.0 generate ${{ env.BUILD_FOLDER }}/allure-results --clean -o ${{ env.BUILD_FOLDER }}/allure-report
 
-      - name: Debug Report Summary
+      - name: Finalize History for Deployment
         if: always()
         run: |
-          cat ${{ env.BUILD_FOLDER }}/allure-report/widgets/summary.json || echo "Summary not found"
-
-      - name: Finalize History
-        if: always()
-        run: |
-          mkdir -p ${{ env.BUILD_FOLDER }}/allure-report/history
-          cp -r ${{ env.BUILD_FOLDER }}/allure-results/history/* ${{ env.BUILD_FOLDER }}/allure-report/history/ || echo "Nothing to save"
-
+          ls -la ${{ env.BUILD_FOLDER }}/allure-report/history
+          
       - name: Upload artifact for deployment
         if: always()
         uses: actions/upload-pages-artifact@v3
