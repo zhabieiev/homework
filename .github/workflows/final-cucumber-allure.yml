@@ -62,7 +62,7 @@ jobs:
         if: always()
         run: |
           echo "Checking for result files in ${{ env.BUILD_FOLDER }}/allure-results:"
-          ls -R ${{ env.BUILD_FOLDER }}/allure-results || echo "Directory not found"
+          ls -la ${{ env.BUILD_FOLDER }}/allure-results || echo "Directory not found"
 
       - name: Load Allure history
         uses: actions/checkout@v4
@@ -72,23 +72,22 @@ jobs:
           ref: gh-pages
           path: gh-pages-dir
 
-      - name: Copy Allure history to results
+      - name: Prepare History for Trends
         if: always()
         run: |
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-results/history
-          cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/ || echo "No history found"
+          cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/ || echo "No previous history found"
 
       - name: Generate Allure Report
         if: always()
         run: |
-          # Use stable 2.30.0 version with traditional syntax
           npx allure-commandline@2.30.0 generate ${{ env.BUILD_FOLDER }}/allure-results --clean -o ${{ env.BUILD_FOLDER }}/allure-report
 
-      - name: Save history to report
+      - name: Save history for next run
         if: always()
         run: |
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-report/history
-          cp -r ${{ env.BUILD_FOLDER }}/allure-results/history/* ${{ env.BUILD_FOLDER }}/allure-report/history/ || echo "No history to save"
+          cp -r ${{ env.BUILD_FOLDER }}/allure-results/history/* ${{ env.BUILD_FOLDER }}/allure-report/history/ || echo "Nothing to save"
 
       - name: Upload artifact for deployment
         if: always()
@@ -109,11 +108,3 @@ jobs:
           name: test-screenshots
           path: final/reports/screenshots/
           retention-days: 7
-
-      - name: Upload Allure HTML report (as Zip)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-html-report
-          path: final/allure-report
-          retention-days: 14
