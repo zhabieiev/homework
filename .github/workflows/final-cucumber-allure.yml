@@ -65,9 +65,8 @@ jobs:
       - name: Prepare Clean Results with History
         if: always()
         run: |
-          mkdir -p ${{ env.BUILD_FOLDER }}/allure-results
-          find ${{ env.BUILD_FOLDER }}/allure-results -maxdepth 1 -type f -delete
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-results/history
+          find ${{ env.BUILD_FOLDER }}/allure-results -maxdepth 1 -type f -delete
           if [ -d "gh-pages-dir/history" ] && [ "$(ls -A gh-pages-dir/history)" ]; then
             cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/
           fi
