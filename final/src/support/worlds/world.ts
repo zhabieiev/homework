@@ -1,8 +1,6 @@
 import { World, IWorldOptions, setWorldConstructor, setDefaultTimeout } from '@cucumber/cucumber';
 import { APIRequestContext, APIResponse, Page, Browser, BrowserContext } from '@playwright/test';
-
 import { VariablesController } from '../utils/variables.controller.ts';
-
 import { MainPage } from '../../ui/pages/main.page.ts';
 import { VideoPage } from '../../ui/pages/video.page.ts';
 import { SearchResultsPage } from '../../ui/pages/search-results.page.ts';
@@ -33,6 +31,9 @@ export class CustomWorld extends World {
     }
 
     get mainPage(): MainPage {
+        if (!this.page) {
+            throw new Error("this.page is undefined. Ensure that the Before(@ui) hook has executed and your scenario is tagged with @ui");
+        }
         if (!this._mainPage) {
             this._mainPage = new MainPage(this.page, this.varController);
         }
@@ -40,6 +41,9 @@ export class CustomWorld extends World {
     }
 
     get videoPage(): VideoPage {
+        if (!this.page) {
+            throw new Error("this.page is undefined. Ensure that the Before(@ui) hook has executed and your scenario is tagged with @ui");
+        }
         if (!this._videoPage) {
             this._videoPage = new VideoPage(this.page, this.varController);
         }
@@ -47,6 +51,9 @@ export class CustomWorld extends World {
     }
 
     get searchResultsPage(): SearchResultsPage {
+        if (!this.page) {
+            throw new Error("this.page is undefined. Ensure that the Before(@ui) hook has executed and your scenario is tagged with @ui");
+        }
         if (!this._searchResultsPage) {
             this._searchResultsPage = new SearchResultsPage(this.page, this.varController);
         }

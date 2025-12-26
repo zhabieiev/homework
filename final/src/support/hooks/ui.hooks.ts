@@ -1,7 +1,24 @@
-import { After, Status } from '@cucumber/cucumber';
+import { Before, After, Status } from '@cucumber/cucumber';
+import { chromium } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 import { CustomWorld } from '../worlds/world.ts';
+import { PropertyLoader } from '../utils/property-loader.ts';
+
+Before({ tags: '@ui' }, async function (this: CustomWorld) {
+    PropertyLoader.loadEnvProperties(this.varController);
+
+    this.browser = await chromium.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    this.context = await this.browser.newContext({
+        viewport: { width: 1920, height: 1080 }
+    });
+
+    this.page = await this.context.newPage();
+});
 
 After({ tags: '@ui' }, async function (this: CustomWorld, scenario) {
     if (this.page && scenario.result?.status === Status.FAILED) {
@@ -20,7 +37,6 @@ After({ tags: '@ui' }, async function (this: CustomWorld, scenario) {
         });
 
         this.attach(screenshot, 'image/png');
-        console.log(`Скриншот сохранен: ${screenshotPath}`);
     }
 
     await this.page?.close();
