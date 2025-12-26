@@ -1,6 +1,7 @@
-import { expect, Locator } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page.ts';
 import { DeepSearchComponent } from '../components/deep-search.component.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 
 export class VideoPage extends BasePage {
     private readonly SEARCH_INPUT_SELECTOR = 'input.MuiInputBase-input'; 
@@ -8,10 +9,23 @@ export class VideoPage extends BasePage {
     private readonly DEEP_SEARCH_PANEL_SELECTOR = '.MuiBox-root:has([role="tablist"])';
     private readonly TITLE_SELECTOR = '[data-a="page-player-main-info"] [data-a="video-title"]';
 
-    public readonly searchInput: Locator = this.page.locator(this.SEARCH_INPUT_SELECTOR);
-    public readonly searchInVideoBtn: Locator = this.page.locator(this.SEARCH_IN_VIDEO_BTN_SELECTOR);
-    public readonly videoTitle: Locator = this.page.locator(this.TITLE_SELECTOR);
-    public readonly deepSearch = new DeepSearchComponent(this.page.locator(this.DEEP_SEARCH_PANEL_SELECTOR), this.page);
+    public readonly searchInput: Locator;
+    public readonly searchInVideoBtn: Locator;
+    public readonly videoTitle: Locator;
+    public readonly deepSearch: DeepSearchComponent;
+
+    constructor(page: Page, varController: VariablesController) {
+        super(page, varController);
+
+        this.searchInput = this.page.locator(this.SEARCH_INPUT_SELECTOR);
+        this.searchInVideoBtn = this.page.locator(this.SEARCH_IN_VIDEO_BTN_SELECTOR);
+        this.videoTitle = this.page.locator(this.TITLE_SELECTOR);
+        
+        this.deepSearch = new DeepSearchComponent(
+            this.page.locator(this.DEEP_SEARCH_PANEL_SELECTOR), 
+            this.page
+        );
+    }
 
     async verifyVideoTitle(expectedTitle: string) {
         await expect(this.page).not.toHaveURL(/.*index\.html#\/$/);

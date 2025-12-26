@@ -1,5 +1,4 @@
 @api
-@allure.epic:API_Testing
 Feature: Retrieves multiple playlists
 
     Scenario Outline: 01 Read player multiplaylist

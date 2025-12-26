@@ -7,11 +7,13 @@ export class ChannelComponent extends BaseComponent {
     private readonly VIDEO_TITLE_SELECTOR = '[data-a="video-title"]';
     private readonly NEXT_BUTTON_SELECTOR = '[data-a="scroll-next"]';
 
-    public readonly videoItems: Locator = this.root.locator(this.VIDEO_ITEM_SELECTOR);
-    public readonly nextButton: Locator = this.root.locator(this.NEXT_BUTTON_SELECTOR);
+    public readonly videoItems: Locator;
+    public readonly nextButton: Locator;
 
     constructor(root: Locator, page: Page, private varController: VariablesController) {
         super(root, page);
+        this.videoItems = this.root.locator(this.VIDEO_ITEM_SELECTOR);
+        this.nextButton = this.root.locator(this.NEXT_BUTTON_SELECTOR);
     }
 
     async clickVideoByIndex(index: number) {

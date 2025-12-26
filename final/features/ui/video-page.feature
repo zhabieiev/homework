@@ -1,5 +1,4 @@
 @ui
-@allure.epic:UI_Testing
 Feature: Channel Navigation
 
   Scenario: Open specific video from Brooklyn Nets channel

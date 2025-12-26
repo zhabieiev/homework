@@ -1,15 +1,22 @@
-import { expect, Locator } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 
 export class SearchResultsPage extends BasePage {
     private readonly SEARCH_PAGE_CONTAINER = '[data-a="page-search"]';
     private readonly TOTAL_COUNT_SELECTOR = '.MuiTypography-root:has-text("Results")';
     private readonly RESULT_TITLES_SELECTOR = '[data-a="video-title"]';
 
-    public readonly totalCount: Locator = this.page
-        .locator(this.SEARCH_PAGE_CONTAINER)
-        .locator(this.TOTAL_COUNT_SELECTOR);
-    public readonly resultTitles: Locator = this.page.locator(this.RESULT_TITLES_SELECTOR);
+    public readonly totalCount: Locator;
+    public readonly resultTitles: Locator;
+
+    constructor(page: Page, varController: VariablesController) {
+        super(page, varController);
+        this.totalCount = this.page
+            .locator(this.SEARCH_PAGE_CONTAINER)
+            .locator(this.TOTAL_COUNT_SELECTOR);
+        this.resultTitles = this.page.locator(this.RESULT_TITLES_SELECTOR);
+    }
 
     async verifyTotalCount(expectedCount: string) {
         await expect(this.totalCount).toHaveText(`${expectedCount} Results`);

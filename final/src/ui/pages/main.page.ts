@@ -1,5 +1,6 @@
-import { Locator } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts'; // проверь путь
 import { ChannelComponent } from '../components/channel.component.ts';
 
 export class MainPage extends BasePage {
@@ -7,8 +8,14 @@ export class MainPage extends BasePage {
     private readonly CHANNEL_CONTAINER_SELECTOR = '[data-a="channel-type-background"]';
     private readonly CHANNEL_TITLE_SELECTOR = '[data-a="channel-title"]';
 
-    public readonly searchInput: Locator = this.page.locator(this.SEARCH_INPUT_SELECTOR);
-    public readonly channelContainers = this.page.locator(this.CHANNEL_CONTAINER_SELECTOR);
+    public readonly searchInput: Locator;
+    public readonly channelContainers: Locator;
+
+    constructor(page: Page, varController: VariablesController) {
+        super(page, varController);
+        this.searchInput = this.page.locator(this.SEARCH_INPUT_SELECTOR);
+        this.channelContainers = this.page.locator(this.CHANNEL_CONTAINER_SELECTOR);
+    }
 
     async searchFor(query: string) {
         await this.searchInput.fill(query);

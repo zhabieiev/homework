@@ -1,5 +1,4 @@
 @api
-@allure.epic:API_Testing
 Feature: Player request
 
   Scenario Outline: 02 Read player request

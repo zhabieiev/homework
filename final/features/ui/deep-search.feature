@@ -1,5 +1,4 @@
 @ui
-@allure.epic:UI_Testing
 Feature: Video Deep Search Navigation
 
   Scenario: Verify people appearances and timestamps in Deep Search

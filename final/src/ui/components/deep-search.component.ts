@@ -1,4 +1,4 @@
-import { Locator, expect } from '@playwright/test';
+import { Locator, expect, Page } from '@playwright/test';
 import { BaseComponent } from './base.component.ts';
 
 export class DeepSearchComponent extends BaseComponent {
@@ -6,7 +6,12 @@ export class DeepSearchComponent extends BaseComponent {
     private readonly TAB_CONTENT_SELECTOR = 'div[class*="_TabContent"]';
     private readonly TIMESTAMP_SELECTOR = '.MuiTypography-root:has-text(":")';
 
-    public readonly tabs: Locator = this.root.locator(this.TAB_SELECTOR);
+    public readonly tabs: Locator;
+
+    constructor(root: Locator, page: Page) {
+        super(root, page);
+        this.tabs = this.root.locator(this.TAB_SELECTOR);
+    }
 
     async openTab(tabName: string) {
         const targetTab = this.tabs.filter({ hasText: tabName });
