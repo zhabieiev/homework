@@ -9,7 +9,7 @@
         "report:allure": "npm run pre:report && allure generate allure-results --clean -o allure-report && allure open allure-report",
         "cucumber": "cross-env NODE_OPTIONS=\"--loader ts-node/esm --no-warnings\" cucumber-js --config cucumber.cjs",
         "test:base": "npm run clean:allure && npm run cucumber -- --format allure-cucumberjs/reporter --format-options \"{\\\"resultsDir\\\":\\\"allure-results\\\"}\"",
-        "test:ci:ui": "cross-env ENV=qa NODE_OPTIONS=\"--loader ts-node/esm\" cucumber-js --config cucumber.cjs --tags \"@ui\"",
+        "test:ci:ui": "cross-env ENV=qa TS_NODE_PROJECT=tsconfig.ui.json npx cucumber-js --config cucumber.cjs --tags \"@ui and not @api\"",
         "test:ui:qa": "cross-env ENV=qa npm run test:base -- --tags \"@ui\" && npm run report:allure || npm run report:allure",
         "test:api:qa": "cross-env ENV=qa npm run test:base -- --tags \"@api\" && npm run report:allure || npm run report:allure",
         "test:all:qa": "cross-env ENV=qa npm run test:base -- --tags \"@api or @ui\" && npm run report:allure || npm run report:allure",

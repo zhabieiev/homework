@@ -1,6 +1,6 @@
 import { Before, After, Status, setDefaultTimeout } from '@cucumber/cucumber';
 import { chromium, expect } from '@playwright/test';
-import { PropertyLoader } from '../../api/utils/property-loader.ts';
+import { PropertyLoader } from '../../support/utils/property-loader.ts';
 import { CustomWorld } from '../worlds/world.ts';
 
 setDefaultTimeout(30 * 1000);

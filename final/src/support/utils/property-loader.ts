@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { VariablesController } from '../utils/controllers/variables.controller.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 
 export class PropertyLoader {
     private static cache: Map<string, string> = new Map();

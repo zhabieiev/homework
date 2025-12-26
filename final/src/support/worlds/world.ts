@@ -1,7 +1,7 @@
 import { World, IWorldOptions, setWorldConstructor, setDefaultTimeout } from '@cucumber/cucumber';
 import { APIRequestContext, APIResponse, Page, Browser, BrowserContext } from '@playwright/test';
-import { TmPlaylistService } from '../../api/services/player.service.ts';
-import { VariablesController } from '../../api/utils/controllers/variables.controller.ts';
+
+import { VariablesController } from '../utils/variables.controller.ts';
 
 import { MainPage } from '../../ui/pages/main.page.ts';
 import { VideoPage } from '../../ui/pages/video.page.ts';
@@ -16,7 +16,7 @@ export class CustomWorld extends World {
     public apiResponse!: APIResponse;
 
     public varController: VariablesController;
-    public playlistService!: TmPlaylistService;
+    public playlistService!: any; 
 
     private _mainPage?: MainPage;
     private _videoPage?: VideoPage;
@@ -25,6 +25,11 @@ export class CustomWorld extends World {
     constructor(options: IWorldOptions) {
         super(options);
         this.varController = new VariablesController();
+    }
+
+    async initApiServices() {
+        const { TmPlaylistService } = await import('../../api/services/player.service.ts');
+        this.playlistService = new TmPlaylistService(this.apiRequest, this.varController);
     }
 
     get mainPage(): MainPage {
@@ -43,9 +48,9 @@ export class CustomWorld extends World {
 
     get searchResultsPage(): SearchResultsPage {
         if (!this._searchResultsPage) {
-        this._searchResultsPage = new SearchResultsPage(this.page, this.varController);
-    }
-    return this._searchResultsPage;
+            this._searchResultsPage = new SearchResultsPage(this.page, this.varController);
+        }
+        return this._searchResultsPage;
     }
 }
 

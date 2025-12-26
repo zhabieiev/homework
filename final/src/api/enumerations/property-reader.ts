@@ -1,5 +1,5 @@
 import { StringConvertor } from '../utils/converters/string.convertor.ts';
-import { VariablesController } from '../utils/controllers/variables.controller.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 
 export abstract class PropertyReader {
     constructor(protected readonly _name: string) {}

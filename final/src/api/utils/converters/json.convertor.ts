@@ -1,4 +1,4 @@
-import { VariablesController } from '../controllers/variables.controller.ts';
+import { VariablesController } from '../../../support/utils/variables.controller.ts';
 
 export class JsonConvertor {
     private static readonly REGEX_INDEX = /\d+/;

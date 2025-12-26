@@ -1,8 +1,9 @@
 import { Before, ITestCaseHookParameter } from '@cucumber/cucumber';
 import { request } from '@playwright/test';
 import { CustomWorld } from '../worlds/world.ts';
-import { TmPlaylistService } from '../../api/services/player.service.ts';
-import { PropertyLoader } from '../../api/utils/property-loader.ts';
+
+// Перенесли PropertyLoader в support/utils
+import { PropertyLoader } from '../../support/utils/property-loader.ts';
 
 const ENVS = {
     dev: 'http://ac-dev-trafficmanager-internal.dev-anyclip.com:8080/trafficmanager/api/',
@@ -16,7 +17,6 @@ Before({ tags: "@api" }, async function (this: CustomWorld, scenario: ITestCaseH
     const baseUrl = ENVS[env];
 
     const currentScenarioName = scenario.pickle.name;
-    
     if (currentScenarioName !== lastScenarioName) {
         console.log(`\n🚀 Scenario: ${currentScenarioName}`);
         lastScenarioName = currentScenarioName;
@@ -32,5 +32,6 @@ Before({ tags: "@api" }, async function (this: CustomWorld, scenario: ITestCaseH
 
     PropertyLoader.loadEnvProperties(this.varController);
 
+    const { TmPlaylistService } = await import('../../api/services/player.service.ts');
     this.playlistService = new TmPlaylistService(this.apiRequest, this.varController);
 });

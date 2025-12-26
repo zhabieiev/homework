@@ -2,7 +2,7 @@ import { APIRequestContext } from 'playwright';
 import { GeneralApiService } from './general.api.service.ts';
 import { HttpStatus } from '../utils/сonstants.ts';
 import { ApiRequest } from '../models/request.ts';
-import { VariablesController } from '../utils/controllers/variables.controller.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 
 import { MultiPlaylistRequestV3 } from '../../../generatedModels/models/MultiPlaylistRequestV3.ts';
 import { MultiPlaylistPlayerResponse } from '../../../generatedModels/models/MultiPlaylistPlayerResponse.ts';

@@ -1,7 +1,7 @@
 import { ClassConstructor } from 'class-transformer';
 import { JsonConvertor } from './converters/json.convertor.ts';
 import { FileParseUtils } from './file-parse-utils.ts';
-import { VariablesController } from './controllers/variables.controller.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 
 export class Populator {
     public static populate<T>(

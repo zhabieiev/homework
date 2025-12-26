@@ -1,5 +1,5 @@
 import { APIRequestContext, APIResponse } from 'playwright';
-import { VariablesController } from '../utils/controllers/variables.controller.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 import { StringConvertor } from '../utils/converters/string.convertor.ts';
 import { MapConvertor } from '../utils/converters/map.converter.ts';
 import { RequestPrefixes } from '../enumerations/request-prefixes';

@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 import { BaseComponent } from './base.component.ts';
-import { VariablesController } from '../../api/utils/controllers/variables.controller.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 
 export class ChannelComponent extends BaseComponent {
     private readonly VIDEO_ITEM_SELECTOR = 'a:has(img), a:has([data-a="video-duration"])';

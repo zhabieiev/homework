@@ -1,5 +1,5 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { VariablesController } from '../../api/utils/controllers/variables.controller.ts';
+import { VariablesController } from '../../support/utils/variables.controller.ts';
 
 export abstract class BasePage {
     constructor(

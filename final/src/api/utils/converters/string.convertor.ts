@@ -1,6 +1,6 @@
 import { DateConverter } from './date.converter.ts';
 import { PropertiesController } from '../controllers/properties.controller.ts';
-import { VariablesController } from '../controllers/variables.controller.ts';
+import { VariablesController } from '../../../support/utils/variables.controller.ts';
 import { FileUtils } from '../file-utils.ts';
 
 export class StringConvertor {
