@@ -1,37 +1,26 @@
-import { Before, After, Status, setDefaultTimeout } from '@cucumber/cucumber';
-import { chromium, expect } from '@playwright/test';
-import { PropertyLoader } from '../../support/utils/property-loader.ts';
+import { After, Status } from '@cucumber/cucumber';
+import * as fs from 'fs';
+import * as path from 'path';
 import { CustomWorld } from '../worlds/world.ts';
-
-setDefaultTimeout(30 * 1000);
-expect.configure({ timeout: 15000 });
-
-Before({ tags: '@ui' }, async function (this: CustomWorld) {
-    PropertyLoader.loadEnvProperties(this.varController);
-
-    this.browser = await chromium.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-
-    this.context = await this.browser.newContext({
-        viewport: { width: 1920, height: 1080 } 
-    });
-
-    this.page = await this.context.newPage();
-    this.page.setDefaultTimeout(10000);
-});
 
 After({ tags: '@ui' }, async function (this: CustomWorld, scenario) {
     if (this.page && scenario.result?.status === Status.FAILED) {
-        try {
-            const screenshot = await this.page.screenshot({
-                fullPage: true
-            });
-            this.attach(screenshot, 'image/png');
-        } catch (error) {
-            console.error('Не удалось сделать скриншот:', error);
+        const screenshotDir = path.join(process.cwd(), 'reports', 'screenshots');
+        
+        if (!fs.existsSync(screenshotDir)) {
+            fs.mkdirSync(screenshotDir, { recursive: true });
         }
+
+        const safeFileName = scenario.pickle.name.replace(/[^a-z0-9]/gi, '_');
+        const screenshotPath = path.join(screenshotDir, `${safeFileName}.png`);
+
+        const screenshot = await this.page.screenshot({
+            path: screenshotPath,
+            fullPage: true
+        });
+
+        this.attach(screenshot, 'image/png');
+        console.log(`Скриншот сохранен: ${screenshotPath}`);
     }
 
     await this.page?.close();

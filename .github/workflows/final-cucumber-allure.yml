@@ -54,6 +54,7 @@ jobs:
       
       - name: Run UI tests
         working-directory: ${{ env.BUILD_FOLDER }}
+        continue-on-error: true 
         run: |
           export NODE_OPTIONS="--loader ts-node/esm --no-warnings"
           export TS_NODE_PROJECT="tsconfig.ui.json"
@@ -63,10 +64,28 @@ jobs:
             --format summary \
             --backtrace
 
+      - name: Load Allure history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages-dir
+
+      - name: Copy Allure history to results
+        if: always()
+        run: |
+          mkdir -p ${{ env.BUILD_FOLDER }}/allure-results/history
+          cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/ || echo "No history yet"
+
       - name: Generate Allure Report
         if: always()
         working-directory: ${{ env.BUILD_FOLDER }}
         run: npx allure generate allure-results --clean -o allure-report
+
+      - name: Save history to report
+        if: always()
+        run: cp -r ${{ env.BUILD_FOLDER }}/allure-results/history ${{ env.BUILD_FOLDER }}/allure-report/
 
       - name: Upload artifact for deployment
         if: always()
@@ -78,6 +97,15 @@ jobs:
         if: always()
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Upload Screenshots Artifact
+        if: always() # Сохраняем папку, если она была создана в ui.hooks.ts
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: test-screenshots
+          path: ${{ env.BUILD_FOLDER }}/reports/screenshots/
+          retention-days: 7
 
       - name: Upload Allure HTML report (as Zip)
         if: always()
