@@ -66,32 +66,37 @@ jobs:
           ref: gh-pages
           path: gh-pages-dir
 
-      - name: Prepare History with Auto-Clean
+      - name: Prepare Results and History
         if: always()
         run: |
-          # Путь к результатам
-          RESULTS_HISTORY="${{ env.BUILD_FOLDER }}/allure-results/history"
-          mkdir -p $RESULTS_HISTORY
+          mkdir -p ${{ env.BUILD_FOLDER }}/allure-results/history
           
-          # Проверяем, существует ли история в gh-pages и не пуста ли она
-          if [ -d "gh-pages-dir/history" ] && [ "$(ls -A gh-pages-dir/history)" ]; then
-            echo "Previous history found, copying..."
-            cp -r gh-pages-dir/history/* $RESULTS_HISTORY/
-          else
-            echo "No valid history found. Starting from scratch."
+          if [ -d "gh-pages-dir/history" ]; then
+            cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/ || echo "No history files to copy"
           fi
+          
+          echo "Executor=GitHub Actions" > ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
+          echo "Run_Number=${{ github.run_number }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
+          echo "Run_ID=${{ github.run_id }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
+          echo "Branch=${{ github.ref_name }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
 
       - name: Generate Allure Report
         if: always()
         run: |
+          rm -rf ${{ env.BUILD_FOLDER }}/allure-report
           npx allure-commandline@2.30.0 generate ${{ env.BUILD_FOLDER }}/allure-results --clean -o ${{ env.BUILD_FOLDER }}/allure-report
 
-      - name: Finalize Report History
+      - name: Debug Report Content
         if: always()
         run: |
-          # Копируем обновленную историю в финальный отчет для деплоя
+          echo "Checking generated report summary:"
+          cat ${{ env.BUILD_FOLDER }}/allure-report/widgets/summary.json || echo "Summary not found"
+
+      - name: Finalize History
+        if: always()
+        run: |
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-report/history
-          cp -r ${{ env.BUILD_FOLDER }}/allure-results/history/* ${{ env.BUILD_FOLDER }}/allure-report/history/
+          cp -r ${{ env.BUILD_FOLDER }}/allure-results/history/* ${{ env.BUILD_FOLDER }}/allure-report/history/ || echo "Nothing to save"
 
       - name: Upload artifact for deployment
         if: always()
