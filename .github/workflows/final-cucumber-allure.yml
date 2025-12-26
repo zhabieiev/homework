@@ -55,11 +55,13 @@ jobs:
       - name: Run UI tests
         working-directory: ${{ env.BUILD_FOLDER }}
         run: |
-          NODE_OPTIONS="--loader ts-node/esm --no-warnings" \
-          TS_NODE_PROJECT=tsconfig.ui.json \
-          npx cross-env ENV=qa \
-          npx cucumber-js --config cucumber.cjs --tags "@ui and not @api"
-        continue-on-error: true
+          export NODE_OPTIONS="--loader ts-node/esm --no-warnings"
+          export TS_NODE_PROJECT="tsconfig.ui.json"
+          npx cross-env ENV=qa npx cucumber-js \
+            --config cucumber.cjs \
+            --tags "@ui and not @api" \
+            --format summary \
+            --backtrace
 
       - name: Generate Allure Report
         if: always()
