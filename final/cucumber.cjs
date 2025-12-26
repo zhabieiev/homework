@@ -1,3 +1,5 @@
+const isCI = process.env.TS_NODE_PROJECT === 'tsconfig.ui.json';
+
 module.exports = {
   default: {
     formatOptions: {
@@ -9,7 +11,9 @@ module.exports = {
       "allure-cucumberjs/reporter"
     ],
     paths: ["features/**/*.feature"],
-    import: ["src/**/*.ts"],
+    import: isCI 
+      ? ["src/ui/**/*.ts", "src/support/**/*.ts"] 
+      : ["src/**/*.ts"],
     loader: ["ts-node/esm"]
   }
 };
