@@ -9,6 +9,7 @@ on:
     branches: [ main ]
     paths:
       - 'final/**'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -70,11 +71,9 @@ jobs:
         if: always()
         run: |
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-results/history
-          
-          if [ -d "gh-pages-dir/history" ]; then
-            cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/ || echo "No history files to copy"
+          if [ -d "gh-pages-dir/history" ] && [ "$(ls -A gh-pages-dir/history)" ]; then
+            cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/
           fi
-          
           echo "Executor=GitHub Actions" > ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
           echo "Run_Number=${{ github.run_number }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
           echo "Run_ID=${{ github.run_id }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
@@ -86,10 +85,9 @@ jobs:
           rm -rf ${{ env.BUILD_FOLDER }}/allure-report
           npx allure-commandline@2.30.0 generate ${{ env.BUILD_FOLDER }}/allure-results --clean -o ${{ env.BUILD_FOLDER }}/allure-report
 
-      - name: Debug Report Content
+      - name: Debug Report Summary
         if: always()
         run: |
-          echo "Checking generated report summary:"
           cat ${{ env.BUILD_FOLDER }}/allure-report/widgets/summary.json || echo "Summary not found"
 
       - name: Finalize History
