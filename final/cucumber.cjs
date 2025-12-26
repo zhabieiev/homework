@@ -10,14 +10,14 @@ module.exports = {
       "progress-bar",
       "allure-cucumberjs/reporter"
     ],
-    publishQuiet: true, 
     paths: ["features/**/*.feature"],
-    import: [
-      "src/ui/steps/**/*.ts",
-      "src/api/steps/**/*.ts",
-      "src/support/worlds/world.ts",
-      "src/support/hooks/ui.hooks.ts"
-    ],
+    import: isCI 
+      ? [
+          "src/ui/steps/**/*.ts",
+          "src/support/worlds/world.ts",
+          "src/support/hooks/ui.hooks.ts"
+        ] 
+      : ["src/**/*.ts"],
     loader: ["ts-node/esm"]
   }
 };
