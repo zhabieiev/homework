@@ -9,7 +9,7 @@ Before({ tags: '@ui' }, async function (this: CustomWorld) {
     PropertyLoader.loadEnvProperties(this.varController);
 
     this.browser = await chromium.launch({
-        headless: true,
+        headless: process.env.CI === 'true',
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 

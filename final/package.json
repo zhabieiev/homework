@@ -4,15 +4,15 @@
     "type": "module",
     "scripts": {
         "generate:models": "openapi-generator-cli generate -i http://ac-dev-trafficmanager-internal.dev-anyclip.com:8080/trafficmanager/swagger/openapi-tm.json -g typescript -o ./generatedModels --additional-properties=modelPropertyNaming=original --global-property models,modelTests=false",
-        "clean:allure": "rimraf allure-results/*.json allure-results/*.png allure-results/*.txt allure-results/*.csv",
-        "pre:report": "shx mkdir -p allure-results/history && shx cp -r allure-report/history/* allure-results/history || true",
+        "clean:allure": "shx rm -f allure-results/*.json allure-results/*.png allure-results/*.txt allure-results/*.csv allure-results/*.properties",
+        "pre:report": "shx mkdir -p allure-results/history && (shx cp -r allure-report/history/* allure-results/history || shx true)",
         "report:allure": "npm run pre:report && allure generate allure-results --clean -o allure-report && allure open allure-report",
         "cucumber": "cross-env NODE_OPTIONS=\"--loader ts-node/esm --no-warnings\" cucumber-js --config cucumber.cjs",
-        "test:base": "npm run clean:allure && npm run cucumber -- --format allure-cucumberjs/reporter --format-options \"{\\\"resultsDir\\\":\\\"allure-results\\\"}\"",
-        "test:ci:ui": "rimraf allure-results && cross-env ENV=qa TS_NODE_PROJECT=tsconfig.ui.json npm run test:base -- --tags \"@ui and not @api\"",
-        "test:ui:qa": "cross-env ENV=qa npm run test:base -- --tags \"@ui\" && npm run report:allure || npm run report:allure",
-        "test:api:qa": "cross-env ENV=qa npm run test:base -- --tags \"@api\" && npm run report:allure || npm run report:allure",
-        "test:all:qa": "cross-env ENV=qa npm run test:base -- --tags \"@api or @ui\" && npm run report:allure || npm run report:allure",
+        "test:base": "npm run clean:allure && npm run cucumber -- --format summary --format progress --format allure-cucumberjs/reporter --format-options \"{\\\"resultsDir\\\":\\\"allure-results\\\"}\"",
+        "test:ci:ui": "cross-env ENV=qa TS_NODE_PROJECT=tsconfig.ui.json npm run test:base -- --tags \"@ui and not @api\"",
+        "test:ui:qa": "cross-env ENV=qa npm run test:base -- --tags \"@ui\" || npm run report:allure",
+        "test:api:qa": "cross-env ENV=qa npm run test:base -- --tags \"@api\" || npm run report:allure",
+        "test:all:qa": "cross-env ENV=qa npm run test:base -- --tags \"@api or @ui\" || npm run report:allure",
         "test:full:cycle": "npm run generate:models && npm run test:all:qa"
     },
     "devDependencies": {

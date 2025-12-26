@@ -66,14 +66,11 @@ jobs:
         if: always()
         run: |
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-results
-          
           find ${{ env.BUILD_FOLDER }}/allure-results -maxdepth 1 -type f -delete
-          
           mkdir -p ${{ env.BUILD_FOLDER }}/allure-results/history
           if [ -d "gh-pages-dir/history" ] && [ "$(ls -A gh-pages-dir/history)" ]; then
             cp -r gh-pages-dir/history/* ${{ env.BUILD_FOLDER }}/allure-results/history/
           fi
-          
           echo "Executor=GitHub Actions" > ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
           echo "Run_Number=${{ github.run_number }}" >> ${{ env.BUILD_FOLDER }}/allure-results/environment.properties
 
@@ -91,8 +88,9 @@ jobs:
       - name: Finalize History for Deployment
         if: always()
         run: |
-          ls -la ${{ env.BUILD_FOLDER }}/allure-report/history
-          
+          mkdir -p ${{ env.BUILD_FOLDER }}/allure-report/history
+          cp -r ${{ env.BUILD_FOLDER }}/allure-results/history/* ${{ env.BUILD_FOLDER }}/allure-report/history/ || true
+
       - name: Upload artifact for deployment
         if: always()
         uses: actions/upload-pages-artifact@v3
