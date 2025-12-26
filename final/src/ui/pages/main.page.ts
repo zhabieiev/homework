@@ -18,12 +18,16 @@ export class MainPage extends BasePage {
     async getChannelByName(channelName: string): Promise<ChannelComponent> {
         const channelLocator = this.channelContainers
             .filter({
-                has: this.page.locator(this.CHANNEL_TITLE_SELECTOR, { hasText: channelName })
+                has: this.page.locator(this.CHANNEL_TITLE_SELECTOR, { 
+                    hasText: new RegExp(`^\\s*${channelName}\\s*$`, 'i') 
+                })
             })
             .first();
 
+        await channelLocator.waitFor({ state: 'attached', timeout: 10000 });
         await channelLocator.scrollIntoViewIfNeeded();
         await channelLocator.waitFor({ state: 'visible' });
-        return new ChannelComponent(channelLocator, this.page);
+
+        return new ChannelComponent(channelLocator, this.page, this.varController);
     }
 }

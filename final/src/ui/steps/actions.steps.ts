@@ -1,7 +1,5 @@
 import { Given, When } from '@cucumber/cucumber';
 import { CustomWorld } from '../../support/worlds/world.ts';
-import { MainPage } from '../pages/main.page.ts';
-import { VideoPage } from '../pages/video.page.ts';
 
 Given('ui user opens {string} page', async function (this: CustomWorld, url: string) {
     await this.mainPage.navigate(url);
@@ -22,6 +20,5 @@ When('ui user deep searches for {string} on video page', async function (this: C
 });
 
 When('ui user opens {string} tab in Deep Search panel', async function (this: CustomWorld, tabName: string) {
-    //const videoPage = new VideoPage(this.page, this.varController);
     await this.videoPage.deepSearch.openTab(tabName);
 });

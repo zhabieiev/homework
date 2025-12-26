@@ -1,5 +1,6 @@
-import { Locator } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import { BaseComponent } from './base.component.ts';
+import { VariablesController } from '../../api/utils/controllers/variables.controller.ts';
 
 export class ChannelComponent extends BaseComponent {
     private readonly VIDEO_ITEM_SELECTOR = 'a:has(img), a:has([data-a="video-duration"])';
@@ -8,6 +9,10 @@ export class ChannelComponent extends BaseComponent {
 
     public readonly videoItems: Locator = this.root.locator(this.VIDEO_ITEM_SELECTOR);
     public readonly nextButton: Locator = this.root.locator(this.NEXT_BUTTON_SELECTOR);
+
+    constructor(root: Locator, page: Page, private varController: VariablesController) {
+        super(root, page);
+    }
 
     async clickVideoByIndex(index: number) {
         const targetVideo = this.videoItems.nth(index - 1);
@@ -18,11 +23,15 @@ export class ChannelComponent extends BaseComponent {
             if (await this.nextButton.isHidden()) break;
             
             await this.nextButton.click();
-            await this.page.waitForTimeout(1000);
+            await this.page.waitForTimeout(500);
+        }
+
+        const title = await this.getVideoTitleByIndex(index);
+        if (title) {
+            this.varController.setVar('selectedVideoTitle', title);
         }
 
         await targetVideo.click();
-
         await this.page.waitForLoadState('domcontentloaded');
     }
 
