@@ -1,10 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*", "src/*"]
-    }
+    "noEmit": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/ui/**/*.ts", 

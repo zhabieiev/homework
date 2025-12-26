@@ -12,7 +12,11 @@ module.exports = {
     ],
     paths: ["features/**/*.feature"],
     import: isCI 
-      ? ["src/ui/**/*.ts", "src/support/**/*.ts"] 
+      ? [
+          "src/ui/step-definitions/**/*.ts", 
+          "src/support/worlds/world.ts",
+          "src/support/hooks/ui.hooks.ts"
+        ] 
       : ["src/**/*.ts"],
     loader: ["ts-node/esm"]
   }
