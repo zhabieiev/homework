@@ -1,3 +1,3 @@
 # Final Project
 
-add Allure Trends
+add Git HUb pages
