@@ -80,8 +80,8 @@ jobs:
 
       - name: Generate Allure Report
         if: always()
-        working-directory: ${{ env.BUILD_FOLDER }}
-        run: npx allure generate allure-results --clean -o allure-report
+        run: |
+          npx allure generate ${{ env.BUILD_FOLDER }}/allure-results --clean -o ${{ env.BUILD_FOLDER }}/allure-report
 
       - name: Save history to report
         if: always()
