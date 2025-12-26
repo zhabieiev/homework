@@ -36,9 +36,19 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ${{ env.BUILD_FOLDER }}/package-lock.json
 
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: Install dependencies
         working-directory: ${{ env.BUILD_FOLDER }}
         run: npm ci
+
+      - name: Generate API Models
+        working-directory: ${{ env.BUILD_FOLDER }}
+        run: npm run generate:models
 
       - name: Install Playwright Browsers
         working-directory: ${{ env.BUILD_FOLDER }}
@@ -46,8 +56,7 @@ jobs:
       
       - name: Run UI tests
         working-directory: ${{ env.BUILD_FOLDER }}
-
-        run: npx cross-env ENV=qa npm run cucumber -- --tags "@ui and not @api"
+        run: npx cross-env ENV=qa npm run test:base -- --tags "@ui and not @api"
         continue-on-error: true
 
       - name: Generate Allure Report
