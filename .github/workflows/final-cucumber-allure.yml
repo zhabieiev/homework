@@ -55,16 +55,8 @@ jobs:
       - name: Run UI tests
         working-directory: ${{ env.BUILD_FOLDER }}
         continue-on-error: true 
-        run: |
-          export NODE_OPTIONS="--loader ts-node/esm --no-warnings"
-          export TS_NODE_PROJECT="tsconfig.ui.json"
-          npx cross-env ENV=qa npx cucumber-js \
-            --config cucumber.cjs \
-            --tags "@ui and not @api" \
-            --format summary \
-            --backtrace
+        run: npm run test:ci:ui
 
-      # Шаг отладки: проверяем, что Cucumber создал файлы результатов
       - name: Debug Allure Results Folder
         if: always()
         run: |
@@ -88,8 +80,8 @@ jobs:
       - name: Generate Allure Report
         if: always()
         run: |
-          # В Allure 3.0 путь к результатам идет перед флагом --output
-          npx allure generate ${{ env.BUILD_FOLDER }}/allure-results --output ${{ env.BUILD_FOLDER }}/allure-report
+          # Use stable 2.30.0 version with traditional syntax
+          npx allure-commandline@2.30.0 generate ${{ env.BUILD_FOLDER }}/allure-results --clean -o ${{ env.BUILD_FOLDER }}/allure-report
 
       - name: Save history to report
         if: always()
